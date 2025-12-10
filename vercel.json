@@ -1,5 +1,7 @@
 {
-  "buildCommand": "cd client && npm run build",
-  "outputDirectory": "client/build",
-  "framework": "create-react-app"
+  "build": {
+    "env": {
+      "NODE_VERSION": "18"
+    }
+  }
 }
