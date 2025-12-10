@@ -1,3 +1,7 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index.js" }]
+  "build": {
+    "env": {
+      "NODE_VERSION": "18"
+    }
+  }
 }
