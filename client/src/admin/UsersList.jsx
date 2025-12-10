@@ -1,13 +1,11 @@
 // src/admin/LeadsList.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_URL = "http://localhost:8888";
+import { axiosInstance, BASE_URL } from "../Config";
 
-// Country code to country name mapping
 const COUNTRY_NAMES = {
   GH: "Ghana",
   CH: "Switzerland",
@@ -57,7 +55,8 @@ const UsersList = () => {
     try {
       const params = {};
       if (filterStatus !== "all") params.status = filterStatus;
-      const response = await axios.get(`${BASE_URL}/userlist`, { params });
+
+      const response = await axiosInstance.get(`/userlist`, { params });
 
       if (response.data.success) {
         setUsers(response.data.data || []);
@@ -74,7 +73,7 @@ const UsersList = () => {
     const newStatus = currentStatus === "Verified" ? "To Check" : "Verified";
 
     try {
-      const response = await axios.post(`${BASE_URL}/userstatus`, {
+      const response = await axiosInstance.post(`/userstatus`, {
         id,
         status: newStatus,
       });
@@ -90,24 +89,11 @@ const UsersList = () => {
     }
   };
 
-  // ❌ SEARCH REMOVED → So no filtering by input
   const filteredUsers = users;
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentUsers = filteredUsers.slice(startIndex, endIndex);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const getCountryName = (code) => {
-    return COUNTRY_NAMES[code] || code;
-  };
+  const currentUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
   return (
     <>
@@ -130,8 +116,6 @@ const UsersList = () => {
                   <option value="Verified">Verified</option>
                   <option value="To Check">To Check</option>
                 </select>
-
-                {/* ❌ Search input removed */}
               </div>
             </div>
 
@@ -166,13 +150,12 @@ const UsersList = () => {
 
                               {/* Country */}
                               <td>
-                                <span className="font-weight-bold">{user.country}</span>{" "}
-                                <span className="text-muted">{getCountryName(user.country)}</span>
+                                <span className="font-weight-bold">{COUNTRY_NAMES[user.country]}</span>
                                 <br />
                                 <small className="text-muted">({user.country})</small>
                               </td>
 
-                              {/* Confidence score */}
+                              {/* Probability */}
                               <td style={{ minWidth: "180px" }}>
                                 <div className="d-flex align-items-center">
                                   <div className="progress flex-grow-1 mr-2" style={{ height: "8px" }}>
@@ -182,9 +165,6 @@ const UsersList = () => {
                                       }`}
                                       role="progressbar"
                                       style={{ width: `${user.probability * 100}%` }}
-                                      aria-valuenow={user.probability * 100}
-                                      aria-valuemin="0"
-                                      aria-valuemax="100"
                                     />
                                   </div>
                                   <span className="text-muted small">
@@ -193,7 +173,7 @@ const UsersList = () => {
                                 </div>
                               </td>
 
-                              {/* Status */}
+                              {/* Status Button */}
                               <td>
                                 <button
                                   className={`has-icon btn ${
@@ -251,7 +231,7 @@ const UsersList = () => {
                           href="#"
                           onClick={(e) => {
                             e.preventDefault();
-                            handlePageChange(currentPage - 1);
+                            if (currentPage > 1) setCurrentPage(currentPage - 1);
                           }}
                         >
                           <i className="fas fa-chevron-left" />
@@ -265,7 +245,7 @@ const UsersList = () => {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              handlePageChange(page + 1);
+                              setCurrentPage(page + 1);
                             }}
                           >
                             {page + 1}
@@ -279,7 +259,7 @@ const UsersList = () => {
                           href="#"
                           onClick={(e) => {
                             e.preventDefault();
-                            handlePageChange(currentPage + 1);
+                            if (currentPage < totalPages) setCurrentPage(currentPage + 1);
                           }}
                         >
                           <i className="fas fa-chevron-right" />

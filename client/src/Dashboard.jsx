@@ -1,35 +1,6 @@
-import React, { useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-
-  // Dashboard API call
-  const dashboard = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      await axios.get("http://localhost:8000/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // ✔ No state updates because you don't want to show counts
-    } catch (error) {
-      console.log("Dashboard fetch error:", error);
-    }
-  };
-
-  // Run once
-  useEffect(() => {
-    dashboard();
-    // eslint-disable-next-line
-  }, []);
-
   return (
     <>
       <div className="main-content">
