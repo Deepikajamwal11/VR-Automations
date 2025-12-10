@@ -7,7 +7,7 @@ const logger = require("morgan");
 const fileUpload = require("express-fileupload");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const crmSyncJob = require("./controller/cron/crmsync"); // 👈 Add this
+const crmSyncJob = require("./controller/cron/crmsync"); 
 
 const indexRouter = require('./routes/index');
 const app = express();
